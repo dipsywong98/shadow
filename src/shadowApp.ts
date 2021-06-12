@@ -13,6 +13,11 @@ export const shadowApp = () => {
     }
   }
   const app = new PIXI.Application({ antialias: true, backgroundColor: 0xffffffff })
+  const blackGraphics = new PIXI.Graphics()
+  blackGraphics.beginFill(0x0)
+  blackGraphics.drawRect(0,0,800, 600)
+  blackGraphics.endFill()
+  app.stage.addChild(blackGraphics)
   body.appendChild(app.view)
 
   app.stage.interactive = true
@@ -44,11 +49,21 @@ export const shadowApp = () => {
     return graphics
   }
   const polygonGraphics = new PIXI.Graphics()
-  container.addChild(polygonGraphics)
+  app.stage.addChild(polygonGraphics)
   const cursorGraphics = new PIXI.Graphics()
   container.addChild(cursorGraphics)
   const ptGraphics = new PIXI.Graphics()
   container.addChild(ptGraphics)
+
+  const bgFront = PIXI.Sprite.from('https://pixijs.io/examples/examples/assets/bg_scene_rotate.jpg');
+  container.addChild(bgFront);
+
+  const thing = new PIXI.Graphics();
+  app.stage.addChild(thing);
+  thing.x = app.screen.width / 2;
+  thing.y = app.screen.height / 2;
+  thing.lineStyle(0);
+  container.mask = polygonGraphics;
 
   for (let i = 0; i < 10; i++) {
     makeSquare(Math.random() * 800, Math.random() * 600, 20, 20)
@@ -79,7 +94,7 @@ export const shadowApp = () => {
 
   const renderCast = (source: Point, intersections: Point[]) => {
     intersections.forEach((point, k) => {
-      polygonGraphics.beginFill(0x990000, 0.3)
+      polygonGraphics.beginFill(0x8bc5ff, 0.4)
       const another = k === intersections.length - 1 ? intersections[0] : intersections[k+1]
       polygonGraphics.drawPolygon(source.x, source.y, point.x, point.y, another.x, another.y)
       polygonGraphics.endFill()
