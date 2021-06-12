@@ -28,7 +28,7 @@ export class Ray {
     return this.src.add(this.dir.mul(t))
   }
 
-  public intersect(segment: Ray): Point | undefined {
+  public intersect(segment: Ray): number {
     const r_px = this.src.x
     const r_py = this.src.y
     const r_dy = this.dir.y
@@ -40,9 +40,9 @@ export class Ray {
     const T2 = (r_dx*(s_py-r_py) + r_dy*(r_px-s_px))/(s_dx*r_dy - s_dy*r_dx)
     const T1 = (s_px+s_dx*T2-r_px)/r_dx
     if (T1 > 0 && T2 >= 0 && T2 <= 1) {
-      return this.at(T1)
+      return T1
     } else {
-      return undefined
+      return Infinity
     }
   }
 }
