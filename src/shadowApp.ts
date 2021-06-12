@@ -46,16 +46,11 @@ export const shadowApp = () => {
   container.addChild(cursorGraphics)
   const ptGraphics = new PIXI.Graphics()
   container.addChild(ptGraphics)
-  let count = 0
 
-
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 10; i++) {
     makeSquare(Math.random() * 800, Math.random() * 600, 20, 20)
   }
   makeSquare(0, 0, 800, 600)
-
-  let lastCount = 0
-
 
   app.ticker.add(() => {
     const { x, y } = app.renderer.plugins.interaction.mouse.global
@@ -66,11 +61,9 @@ export const shadowApp = () => {
     const origin = pt(400, 300)
     const sight = new Ray(origin, pt(x, y))
     let d = Infinity
-    let point: (Point | undefined) = undefined
-    const points: unknown[] = []
+    let point: Point = pt(-1, -1)
     lines.forEach(l => {
       const pt = sight.intersect(l)
-      points.push(pt)
       ptGraphics.clear()
       if (pt) {
         const dd = origin.n2Distance2(pt)
@@ -80,15 +73,11 @@ export const shadowApp = () => {
         }
       }
     })
-    if (point !== undefined) {
+    if (point.x !== -1) {
       cursorGraphics.beginFill(0xDE3249, 1)
       cursorGraphics.drawCircle((point as Point).x, (point as Point).y, 2)
       cursorGraphics.endFill()
-    }
-    count++
-    if (count - lastCount > 1000) {
-      lastCount = count
-      console.log(points)
+      cursorGraphics.lineStyle(4, 0xff0000).moveTo(origin.x, origin.y).lineTo(point.x, point.y)
     }
   })
 
