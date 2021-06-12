@@ -1,7 +1,6 @@
 import * as PIXI from 'pixi.js'
 import { Point, pt } from './Point'
-import { Line } from './Line'
-import { Segment } from './Segment'
+import { Ray } from './Ray'
 
 // @ts-ignore
 window.PIXI = PIXI
@@ -23,7 +22,7 @@ export const shadowApp = () => {
   container.height = 600
   app.stage.addChild(container)
 
-  const lines: Line[] = []
+  const lines: Ray[] = []
 
   const makeSquare = (x: number, y: number, w: number, h: number) => {
     const graphics = new PIXI.Graphics()
@@ -39,7 +38,7 @@ export const shadowApp = () => {
     const p1 = pt(x + w, y)
     const p2 = pt(x + w, y + h)
     const p3 = pt(x, y + h)
-    lines.push(new Segment(p0, p1), new Segment(p1, p2), new Segment(p2, p3), new Segment(p3, p0))
+    lines.push(new Ray(p0, p1), new Ray(p1, p2), new Ray(p2, p3), new Ray(p3, p0))
     return graphics
   }
 
@@ -65,16 +64,16 @@ export const shadowApp = () => {
     cursorGraphics.drawCircle(x, y, 2)
     cursorGraphics.endFill()
     const origin = pt(400, 300)
-    const sight = Line.twoPoints(pt(x, y), origin)
+    const sight = new Ray(origin, pt(x, y))
     let d = Infinity
     let point: (Point | undefined) = undefined
     const points: unknown[] = []
     lines.forEach(l => {
-      const pt = l.intersect(sight)
+      const pt = sight.intersect(l)
       points.push(pt)
       ptGraphics.clear()
       if (pt) {
-        const dd = origin.n1Distance(pt)
+        const dd = origin.n2Distance2(pt)
         if (dd < d) {
           d = dd
           point = pt
