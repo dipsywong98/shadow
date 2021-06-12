@@ -23,6 +23,7 @@ export const shadowApp = () => {
   app.stage.addChild(container)
 
   const lines: Ray[] = []
+  const corners: Point[] = []
 
   const makeSquare = (x: number, y: number, w: number, h: number) => {
     const graphics = new PIXI.Graphics()
@@ -38,9 +39,12 @@ export const shadowApp = () => {
     const p1 = pt(x + w, y)
     const p2 = pt(x + w, y + h)
     const p3 = pt(x, y + h)
+    corners.push(p0, p1, p2, p3)
     lines.push(new Ray(p0, p1), new Ray(p1, p2), new Ray(p2, p3), new Ray(p3, p0))
     return graphics
   }
+  const polygonGraphics = new PIXI.Graphics()
+  container.addChild(polygonGraphics)
 
   const cursorGraphics = new PIXI.Graphics()
   container.addChild(cursorGraphics)
@@ -54,31 +58,47 @@ export const shadowApp = () => {
 
   app.ticker.add(() => {
     const { x, y } = app.renderer.plugins.interaction.mouse.global
+    const sources = [new Point(x, y)]
+    polygonGraphics.clear()
     cursorGraphics.clear()
     cursorGraphics.beginFill(0xDE3249, 1)
     cursorGraphics.drawCircle(x, y, 2)
     cursorGraphics.endFill()
-    const origin = pt(400, 300)
-    const sight = new Ray(origin, pt(x, y))
-    let d = Infinity
-    let point: Point = pt(-1, -1)
-    lines.forEach(l => {
-      const pt = sight.intersect(l)
-      ptGraphics.clear()
-      if (pt) {
-        const dd = origin.n2Distance2(pt)
-        if (dd < d) {
-          d = dd
-          point = pt
-        }
-      }
+    const rays: Ray[] = []
+    sources.forEach((origin) => {
+      corners.forEach((target) => {
+        const ray1 = new Ray(origin, target)
+        rays.push(ray1.rotate(-0.00001), ray1, ray1.rotate(0.00001))
+      })
     })
-    if (point.x !== -1) {
-      cursorGraphics.beginFill(0xDE3249, 1)
-      cursorGraphics.drawCircle((point as Point).x, (point as Point).y, 2)
-      cursorGraphics.endFill()
-      cursorGraphics.lineStyle(4, 0xff0000).moveTo(origin.x, origin.y).lineTo(point.x, point.y)
-    }
+    const intersections: Point[] = rays.sort((a, b) => a.theta - b.theta).map((sight, k) => {
+      let d = Infinity
+      let point: Point = pt(-1, -1)
+      lines.forEach(l => {
+        const pt = sight.intersect(l)
+        ptGraphics.clear()
+        if (pt) {
+          const dd = sight.src.n2Distance2(pt)
+          if (dd < d) {
+            d = dd
+            point = pt
+          }
+        }
+      })
+      if (point.x !== -1) {
+        cursorGraphics.beginFill(0xDE3249, 1)
+        cursorGraphics.drawCircle((point as Point).x, (point as Point).y, 2)
+        cursorGraphics.endFill()
+        cursorGraphics.lineStyle(1, 0xff0000 + 0x10 * k).moveTo(sight.src.x, sight.src.y).lineTo(point.x, point.y)
+      }
+      return point
+    })
+    intersections.forEach((point, k) => {
+      polygonGraphics.beginFill(0x990000, 0.3)
+      const another = k === intersections.length - 1 ? intersections[0] : intersections[k+1]
+      polygonGraphics.drawPolygon(sources[0].x, sources[0].y, point.x, point.y, another.x, another.y)
+      polygonGraphics.endFill()
+    })
   })
 
   return app

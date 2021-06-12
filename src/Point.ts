@@ -22,23 +22,29 @@ export class Point {
 
   public mul (scalar: number) {
     return new Point(
-      this.x * scalar,
-      this.y * scalar
+      this._x * scalar,
+      this._y * scalar
     )
   }
 
   public add (point: Point) {
     return new Point(
-      this.x + point.x,
-      this.y + point.y
+      this._x + point._x,
+      this._y + point._y
     )
   }
 
   public minus (point: Point) {
     return new Point(
-      this.x - point.x,
-      this.y - point.y
+      this._x - point._x,
+      this._y - point._y
     )
+  }
+
+  public rotate (theta: number): Point {
+    const st = Math.sin(theta)
+    const ct = Math.cos(theta)
+    return new Point(ct * this._x - st * this._y, st * this._x + ct * this._y)
   }
 
   get x (): number {
