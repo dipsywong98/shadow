@@ -5,14 +5,6 @@ object-assign
 */
 
 /*!
- * @pixi/accessibility - v6.0.4
- * Compiled Tue, 11 May 2021 18:00:23 UTC
- *
- * @pixi/accessibility is licensed under the MIT License.
- * http://www.opensource.org/licenses/mit-license
- */
-
-/*!
  * @pixi/app - v6.0.4
  * Compiled Tue, 11 May 2021 18:00:23 UTC
  *
